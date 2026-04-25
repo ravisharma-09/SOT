@@ -5,7 +5,7 @@ httpx
 sse-starlette
 python-dotenv
 pydantic
-openenv
+openenv-core
 transformers
 trl
 peft
