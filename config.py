@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+OPENROUTER_BASE_URL: str = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 
 MENTOR_MODEL: str = os.getenv("MENTOR_MODEL", "qwen/qwen3-32b")
 TRICKSTER_MODEL: str = os.getenv("TRICKSTER_MODEL", "google/gemini-2.5-flash")
