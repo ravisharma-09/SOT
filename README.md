@@ -1,1 +1,1 @@
-# SOT
+**#SOT ** : **Society of Thinkers.**
