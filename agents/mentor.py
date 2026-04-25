@@ -1,8 +1,8 @@
 """Mentor agent — precise, factual, direct answers."""
 
 import asyncio
-import sys
 import os
+import sys
 
 import httpx
 
@@ -19,9 +19,18 @@ _HEADERS = {
     "Authorization": f"Bearer {config.OPENROUTER_API_KEY}",
     "Content-Type": "application/json",
 }
+_UNAVAILABLE = "[Mentor is unavailable]"
+_UNAVAILABLE_NO_KEY = "[Mentor is unavailable: OPENROUTER_API_KEY is not set]"
+
+
+def _extract_content(response: httpx.Response) -> str:
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
 
 
 async def _call(question: str) -> str:
+    if not config.OPENROUTER_API_KEY:
+        return _UNAVAILABLE_NO_KEY
     payload = {
         "model": config.MENTOR_MODEL,
         "messages": [
@@ -36,15 +45,15 @@ async def _call(question: str) -> str:
             json=payload,
         )
         resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+        return _extract_content(resp)
 
 
 async def respond(question: str) -> str:
     try:
         return await _call(question)
-    except Exception:
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
         await asyncio.sleep(1)
     try:
         return await _call(question)
-    except Exception:
-        return "[Mentor is unavailable]"
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
+        return _UNAVAILABLE
