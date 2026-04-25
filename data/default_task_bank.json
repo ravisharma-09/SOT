@@ -1,3 +1,144 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "t01",
+      "question": "What is the chemical symbol for gold?",
+      "correct_answer": "Au",
+      "difficulty": "easy",
+      "type": "factual"
+    },
+    {
+      "id": "t02",
+      "question": "What is the capital city of France?",
+      "correct_answer": "Paris",
+      "difficulty": "easy",
+      "type": "factual"
+    },
+    {
+      "id": "t03",
+      "question": "Which planet in our solar system is known as the Red Planet?",
+      "correct_answer": "Mars",
+      "difficulty": "medium",
+      "type": "factual"
+    },
+    {
+      "id": "t04",
+      "question": "In what year did World War II end?",
+      "correct_answer": "1945",
+      "difficulty": "medium",
+      "type": "factual"
+    },
+    {
+      "id": "t05",
+      "question": "Who painted the Mona Lisa?",
+      "correct_answer": "Leonardo da Vinci",
+      "difficulty": "medium",
+      "type": "factual"
+    },
+    {
+      "id": "t06",
+      "question": "In what year was the Magna Carta signed?",
+      "correct_answer": "1215",
+      "difficulty": "hard",
+      "type": "factual"
+    },
+    {
+      "id": "t07",
+      "question": "Which element has atomic number 79?",
+      "correct_answer": "Gold",
+      "difficulty": "hard",
+      "type": "factual"
+    },
+    {
+      "id": "t08",
+      "question": "What is the next number in the sequence: 2, 4, 8, 16, ___?",
+      "correct_answer": "32",
+      "difficulty": "easy",
+      "type": "logical"
+    },
+    {
+      "id": "t09",
+      "question": "All cats are animals. All animals breathe. Do cats breathe? Answer Yes or No.",
+      "correct_answer": "Yes",
+      "difficulty": "easy",
+      "type": "logical"
+    },
+    {
+      "id": "t10",
+      "question": "What is the next number in the Fibonacci sequence: 1, 1, 2, 3, 5, 8, ___?",
+      "correct_answer": "13",
+      "difficulty": "medium",
+      "type": "logical"
+    },
+    {
+      "id": "t11",
+      "question": "A farmer has 17 sheep. All but 9 die. How many sheep are left?",
+      "correct_answer": "9",
+      "difficulty": "medium",
+      "type": "logical"
+    },
+    {
+      "id": "t12",
+      "question": "In a group of 30 people, 20 like tea, 15 like coffee, and 5 like neither. How many people like both tea and coffee?",
+      "correct_answer": "10",
+      "difficulty": "medium",
+      "type": "logical"
+    },
+    {
+      "id": "t13",
+      "question": "Alice is taller than Bob. Bob is taller than Carol. Who is the shortest of the three?",
+      "correct_answer": "Carol",
+      "difficulty": "hard",
+      "type": "logical"
+    },
+    {
+      "id": "t14",
+      "question": "If each letter in PENCIL is shifted forward by 2 positions in the alphabet to produce RGPEKN, what is the encoded form of CAT using the same rule?",
+      "correct_answer": "ECV",
+      "difficulty": "hard",
+      "type": "logical"
+    },
+    {
+      "id": "t15",
+      "question": "Finger is to Hand as Toe is to ___.",
+      "correct_answer": "Foot",
+      "difficulty": "medium",
+      "type": "analogical"
+    },
+    {
+      "id": "t16",
+      "question": "Doctor is to Hospital as Teacher is to ___.",
+      "correct_answer": "School",
+      "difficulty": "medium",
+      "type": "analogical"
+    },
+    {
+      "id": "t17",
+      "question": "Hot is to Cold as Day is to ___.",
+      "correct_answer": "Night",
+      "difficulty": "medium",
+      "type": "analogical"
+    },
+    {
+      "id": "t18",
+      "question": "Library is to Books as Museum is to ___.",
+      "correct_answer": "Artifacts",
+      "difficulty": "medium",
+      "type": "analogical"
+    },
+    {
+      "id": "t19",
+      "question": "Architect is to Blueprint as Composer is to ___.",
+      "correct_answer": "Score",
+      "difficulty": "hard",
+      "type": "analogical"
+    },
+    {
+      "id": "t20",
+      "question": "Cartography is to Maps as Lexicography is to ___.",
+      "correct_answer": "Dictionaries",
+      "difficulty": "hard",
+      "type": "analogical"
+    }
+  ]
 }
