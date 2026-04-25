@@ -1,0 +1,7 @@
+name: society-of-thought
+version: "0.1.0"
+entrypoint: environment.society_env:SocietyEnv
+description: >
+  Multi-agent reasoning environment where a student LLM learns to consult
+  specialists (Mentor, Trickster, Philosopher, Critic) and detect deception
+  to arrive at correct answers.

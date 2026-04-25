@@ -18,15 +18,12 @@ from environment.session_config import (
     get_default_config,
     load_task_bank,
 )
+from intelligence import reward_model as _rm_module
+from intelligence.rubrics import SocietyRubric
 
 
 AVAILABLE_AGENTS = ["mentor", "trickster", "philosopher", "critic"]
 MAX_STEPS = 5
-CONSULT_COST = -0.1
-CORRECT_REWARD = 1.0
-INCORRECT_REWARD = -0.5
-EFFICIENCY_PER_UNUSED = 0.1
-TRUST_PENALTY = -0.3
 
 
 class SocietyObservation(Observation):
@@ -37,6 +34,12 @@ class SocietyObservation(Observation):
     consultations_so_far: list[dict[str, str]] = Field(default_factory=list)
     step: int = 0
     max_steps: int = MAX_STEPS
+
+    def __await__(self):
+        # Makes `await obs` return obs immediately, enabling async callers.
+        if False:
+            yield  # noqa: unreachable — marks function as a generator
+        return self
 
 
 class SocietyAction(Action):
@@ -77,7 +80,8 @@ class SocietyEnv(Environment[SocietyAction, SocietyObservation, SocietyState]):
     """
 
     def __init__(self, config: SessionConfig | None = None) -> None:
-        super().__init__()
+        _rm = _rm_module.load()
+        super().__init__(rubric=SocietyRubric(reward_model=_rm))
         self.config = config or get_default_config()
         self.tasks = load_task_bank(self.config.task_bank_path)
 
@@ -117,18 +121,27 @@ class SocietyEnv(Environment[SocietyAction, SocietyObservation, SocietyState]):
 
     def step(
         self,
-        action: SocietyAction,
+        action: SocietyAction | dict,
         timeout_s: float | None = None,
         **kwargs: Any,
     ) -> SocietyObservation:
-        return asyncio.run(self.step_async(action, timeout_s=timeout_s))
+        if isinstance(action, dict):
+            action = SocietyAction(**action)
+        try:
+            asyncio.get_running_loop()
+            # Already in an async context — return the coroutine for the caller to await.
+            return self.step_async(action, timeout_s=timeout_s)  # type: ignore[return-value]
+        except RuntimeError:
+            return asyncio.run(self.step_async(action, timeout_s=timeout_s))
 
     async def step_async(
         self,
-        action: SocietyAction,
+        action: SocietyAction | dict,
         timeout_s: float | None = None,
         **kwargs: Any,
     ) -> SocietyObservation:
+        if isinstance(action, dict):
+            action = SocietyAction(**action)
         if self._done or self._task is None:
             raise RuntimeError("Episode is over or not initialized. Call reset().")
 
@@ -162,7 +175,7 @@ class SocietyEnv(Environment[SocietyAction, SocietyObservation, SocietyState]):
             self._done = True
             return self._make_obs(
                 done=True,
-                reward=INCORRECT_REWARD,
+                reward=-0.5,  # fixed penalty; cap exceeded skips rubric scoring
                 extra={"reason": "consultation_cap_exceeded"},
             )
 
@@ -178,7 +191,9 @@ class SocietyEnv(Environment[SocietyAction, SocietyObservation, SocietyState]):
         )
         self._step_count = len(self._consultations)
 
-        return self._make_obs(done=False, reward=CONSULT_COST)
+        obs = self._make_obs(done=False, reward=None)
+        obs.reward = self._apply_rubric(action, obs)  # accumulates step; returns -0.1
+        return obs
 
     def _handle_answer(self, action: SocietyAction) -> SocietyObservation:
         answer = str(action.answer or "")
@@ -186,28 +201,28 @@ class SocietyEnv(Environment[SocietyAction, SocietyObservation, SocietyState]):
         answer_cf = answer.casefold()
         is_correct = any(str(k).casefold() in answer_cf for k in keywords)
 
-        base = CORRECT_REWARD if is_correct else INCORRECT_REWARD
-        efficiency_bonus = (MAX_STEPS - len(self._consultations)) * EFFICIENCY_PER_UNUSED
-
         lure = str(self._task.get("trickster_lure") or "")
         trusted_lure = bool(
             self._trickster_lied and lure and lure.casefold() in answer_cf
         )
-        trust_penalty = TRUST_PENALTY if trusted_lure else 0.0
 
-        reward = base + efficiency_bonus + trust_penalty
         self._done = True
 
-        return self._make_obs(
+        # Metadata is read by the rubrics to compute the composite reward.
+        obs = self._make_obs(
             done=True,
-            reward=reward,
+            reward=None,
             extra={
                 "is_correct": is_correct,
                 "trusted_lure": trusted_lure,
+                "trickster_lied": self._trickster_lied,
                 "consultation_count": len(self._consultations),
                 "submitted_answer": answer,
+                "correct_answer": self._task.get("correct_answer", ""),
             },
         )
+        obs.reward = self._apply_rubric(action, obs)  # triggers score_trajectory
+        return obs
 
     async def _call_specialist(
         self, agent_name: str, question: str, draft: str
