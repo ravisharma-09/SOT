@@ -1,0 +1,14 @@
+"""Central configuration — loads all env vars via python-dotenv and exposes them as constants."""
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+
+MENTOR_MODEL: str = os.getenv("MENTOR_MODEL", "qwen/qwen3-32b")
+TRICKSTER_MODEL: str = os.getenv("TRICKSTER_MODEL", "google/gemini-2.5-flash")
+PHILOSOPHER_MODEL: str = os.getenv("PHILOSOPHER_MODEL", "moonshotai/kimi-k2-thinking")
+CRITIC_MODEL: str = os.getenv("CRITIC_MODEL", "deepseek/deepseek-v3.2")
