@@ -1,0 +1,4 @@
+name: societyofmind
+version: 0.1.0
+entrypoint: environment.society_env:SocietyEnv
+description: A multi-agent reasoning env where a student LLM learns to consult specialists and detect deception
