@@ -1,4 +1,4 @@
-"""Philosopher agent — Socratic guide, answers only with questions and analogies."""
+"""Philosopher specialist — Socratic guide using questions and analogies."""
 
 import asyncio
 import os
@@ -29,32 +29,36 @@ def _extract_content(response: httpx.Response) -> str:
     return data["choices"][0]["message"]["content"]
 
 
-async def _call(question: str) -> str:
-    if not config.OPENROUTER_API_KEY:
-        return _UNAVAILABLE_NO_KEY
-    payload = {
-        "model": config.PHILOSOPHER_MODEL,
-        "messages": [
-            {"role": "system", "content": _SYSTEM_PROMPT},
-            {"role": "user", "content": question},
-        ],
-    }
-    async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-        resp = await client.post(
-            f"{config.OPENROUTER_BASE_URL}/chat/completions",
-            headers=_HEADERS,
-            json=payload,
-        )
-        resp.raise_for_status()
-        return _extract_content(resp)
+class Philosopher:
+    async def _call(self, question: str) -> str:
+        if not config.OPENROUTER_API_KEY:
+            return _UNAVAILABLE_NO_KEY
 
+        payload = {
+            "model": config.PHILOSOPHER_MODEL,
+            "messages": [
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": question},
+            ],
+        }
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            resp = await client.post(
+                f"{config.OPENROUTER_BASE_URL}/chat/completions",
+                headers=_HEADERS,
+                json=payload,
+            )
+            resp.raise_for_status()
+            return _extract_content(resp)
 
-async def respond(question: str) -> str:
-    try:
-        return await _call(question)
-    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
-        await asyncio.sleep(1)
-    try:
-        return await _call(question)
-    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
-        return _UNAVAILABLE
+    async def respond(
+        self, question: str, task_context: dict | None = None
+    ) -> str:
+        _ = task_context
+        try:
+            return await self._call(question)
+        except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
+            await asyncio.sleep(1)
+        try:
+            return await self._call(question)
+        except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
+            return _UNAVAILABLE

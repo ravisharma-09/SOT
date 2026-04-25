@@ -5,3 +5,13 @@ httpx
 sse-starlette
 python-dotenv
 pydantic
+openenv
+transformers
+trl
+peft
+bitsandbytes
+unsloth
+matplotlib
+wandb
+huggingface_hub
+datasets
